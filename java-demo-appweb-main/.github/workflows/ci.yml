@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: ["main"]
 
+# Définition des variables d'environnement
 env:
   IMAGE_NAME: usine-logicielle-java
 
