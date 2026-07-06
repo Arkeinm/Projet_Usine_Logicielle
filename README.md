@@ -19,7 +19,7 @@ tout en intégrant :
 
 ---
 
-# 🧾 Contexte
+## 🧾 Contexte
 
 Une entreprise spécialisée dans le développement d’applications web souhaite industrialiser ses pratiques DevOps.
 
@@ -41,7 +41,7 @@ Développement → Intégration → Livraison → Déploiement → Supervision
 
 ---
 
-# 🧭 Vue globale de l’architecture
+## 🧭 Vue globale de l’architecture
 
 ```mermaid
 flowchart LR
@@ -62,7 +62,7 @@ I --> J[Kibana Dashboard]
 
 ---
 
-##  🧩 Stack technique
+## 🧩 Stack technique
 
 | Domaine | Outil | Rôle | Justification |
 |----------|-------|------|---------------|
