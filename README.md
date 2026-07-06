@@ -81,7 +81,8 @@ I --> J[Kibana Dashboard]
 
 ### 📌 Workflow global
 
-![Workflow global](./img/pipeline_complet.png)
+<p align="center">
+  <img src="./img/pipeline_complet.png" alt="Workflow global"width="200">
 
 ---
 
