@@ -15,6 +15,9 @@ jobs:
   # 🧪 1. BUILD + TEST + GENERATION WAR
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: java-demo-appweb-main
 
     steps:
       - name: 📥 Checkout code
@@ -31,6 +34,9 @@ jobs:
         with:
           path: ~/.m2
           key: maven-${{ hashFiles('**/pom.xml') }}
+
+      - name: 🧪 Run server tests (Cucumber + JUnit)
+        run: mvn -B -pl server test
 
       - name: 🏗️ Build WAR with Maven
         run: mvn -B clean package
