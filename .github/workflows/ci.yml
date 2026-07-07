@@ -12,8 +12,39 @@ env:
 
 jobs:
 
+  cucumber-tests:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: java-demo-appweb-main
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: 📦 Cache Maven
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: maven-${{ hashFiles('**/pom.xml') }}
+
+      - name: 🧪 Exécution tests Cucumber
+        run: mvn -B -pl server test
+
+      - name: ✅ Résumé tests
+        run: |
+          echo "Tests Cucumber exécutés"
+
   build:
     runs-on: ubuntu-latest
+    needs: cucumber-tests
     defaults:
       run:
         working-directory: java-demo-appweb-main
