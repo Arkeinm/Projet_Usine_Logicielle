@@ -12,6 +12,35 @@ env:
 
 jobs:
 
+  # 🔐 Scan de secrets - tourne dès le push, aucune dépendance
+  gitleaks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Scan Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # 🧹 Lint du Dockerfile - tourne dès le push, aucune dépendance
+  hadolint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Scan Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: java-demo-appweb-main/Dockerfile
+          failure-threshold: warning
+
   cucumber-tests:
     runs-on: ubuntu-latest
 
@@ -41,6 +70,42 @@ jobs:
       - name: ✅ Résumé tests
         run: |
           echo "Tests Cucumber exécutés"
+
+      - name: 📊 Upload rapport Cucumber HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-report
+          path: java-demo-appweb-main/target/cucumber-report.html
+
+  # 🔎 Scan des dépendances Java (CVE connues dans les libs Maven)
+  dependency-check:
+    runs-on: ubuntu-latest
+    needs: cucumber-tests
+
+    defaults:
+      run:
+        working-directory: java-demo-appweb-main
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: "usine-logicielle-java"
+          path: "java-demo-appweb-main"
+          format: "HTML"
+          out: "reports"
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+
+      - name: 📊 Upload rapport Dependency-Check
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: java-demo-appweb-main/reports
 
   build:
     runs-on: ubuntu-latest
@@ -83,7 +148,7 @@ jobs:
 
   docker:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build, hadolint, gitleaks]
     environment: guillaume
 
     defaults:
@@ -131,10 +196,28 @@ jobs:
           docker tag $IMAGE_NAME ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:latest
 
+  # 🛡️ Scan de vulnérabilités sur l'image Docker construite
+  trivy-scan:
+    runs-on: ubuntu-latest
+    needs: docker
+    environment: guillaume
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Scan Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest"
+          format: "table"
+          severity: "CRITICAL,HIGH"
+          exit-code: "0"   # passe à "1" pour bloquer le pipeline en cas de faille critique/haute
+
 
   deploy:
     runs-on: ubuntu-latest
-    needs: docker
+    needs: trivy-scan
     environment: guillaume
 
     steps:
