@@ -139,5 +139,21 @@ jobs:
     needs: docker
 
     steps:
-      - name: 🚀 Deploy
-        run: echo "Déploiement via Kubernetes / Ansible"
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔑 Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: 🔎 Disable host key checking
+        run: echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+
+      - name: 🚀 Deploy via VM1 (Ansible)
+        run: |
+          ssh -p 2221 vagrant@127.0.0.1 "
+            cd /vagrant &&
+            ansible-playbook ansible/inventory.ini ansible/playbooks/deploy.yml
+          "
