@@ -156,11 +156,14 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_deploy
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
 
       - name: 🚀 Déploiement via Ansible
         run: |
           ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
-            --private-key ~/.ssh/id_deploy \
             --extra-vars "image_name=${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest"
 
       - name: ✅ Fin du pipeline
