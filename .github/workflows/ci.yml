@@ -175,6 +175,6 @@ jobs:
             ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
             -e image_name=${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
           "
-
+      # fin du pipeline
       - name: ✅ Fin du pipeline
         run: echo "✅ Déploiement terminé"
