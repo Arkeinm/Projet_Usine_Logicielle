@@ -134,6 +134,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: docker
+    environment: guillaume
 
     steps:
       - name: 📥 Checkout code
@@ -162,6 +163,8 @@ jobs:
           echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
 
       - name: 🚀 Déploiement via Ansible
+        env:
+          PUBLIC_BASTION_IP: ${{ secrets.PUBLIC_BASTION_IP }}
         run: |
           ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
             --extra-vars "image_name=${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest"
