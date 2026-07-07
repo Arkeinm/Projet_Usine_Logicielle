@@ -80,6 +80,7 @@ jobs:
           name: webapp-war
           path: java-demo-appweb-main/webapp/target/*.war
 
+
   docker:
     runs-on: ubuntu-latest
     needs: build
@@ -133,6 +134,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: docker
+    environment: guillaume
 
     steps:
       - name: 📥 Checkout code
@@ -141,39 +143,31 @@ jobs:
       - name: 🔗 Connexion Tailscale
         uses: tailscale/github-action@v2
         with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID_JO }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET_JO }}
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
 
-      - name: 🐍 Installer Ansible
+      - name: 🐍 Installer Ansible + dépendances
         run: |
           pip install ansible docker
           ansible-galaxy collection install community.docker
 
-
-      - name: 🔑 Setup SSH
+      - name: 🔑 Configurer la clé SSH
         run: |
           mkdir -p ~/.ssh
-
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_deploy
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
 
-          echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-
-      - name: 🔍 Test connexion VM1
+      - name: 🚀 Déploiement via Ansible
+        env:
+          PUBLIC_BASTION_IP: ${{ secrets.PUBLIC_BASTION_IP }}
         run: |
-          ssh vagrant@${{ secrets.VM1_IP }} "echo Connected ✅"
+          ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
+            --extra-vars "image_name=${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest"
 
-      - name: 🚀 Déploiement via VM1
-        run: |
-          ssh vagrant@${{ secrets.VM1_IP }} "
-            cd /vagrant/Projet_Usine_Logicielle &&
-            ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
-            -e image_name=${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-          "
-      # fin du pipeline
       - name: ✅ Fin du pipeline
         run: echo "✅ Déploiement terminé"
