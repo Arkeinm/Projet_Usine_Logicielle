@@ -142,8 +142,8 @@ jobs:
       - name: 🔗 Connexion Tailscale
         uses: tailscale/github-action@v2
         with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID_JO }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET_JO }}
           tags: tag:ci
 
       - name: 🐍 Installer Ansible + dépendances
