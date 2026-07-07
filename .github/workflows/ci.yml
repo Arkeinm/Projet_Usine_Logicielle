@@ -80,7 +80,7 @@ jobs:
           name: webapp-war
           path: java-demo-appweb-main/webapp/target/*.war
 
-
+  # Docker build and push
   docker:
     runs-on: ubuntu-latest
     needs: build
