@@ -150,7 +150,8 @@ jobs:
           pip install ansible docker
           ansible-galaxy collection install community.docker
 
-      - name: 🔑 Setup SSH (FIX ✅)
+
+      - name: 🔑 Setup SSH
         run: |
           mkdir -p ~/.ssh
 
@@ -160,7 +161,8 @@ jobs:
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
 
-          echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          ssh-keyscan -H ${{ secrets.VM1_IP }} >> ~/.ssh/known_hosts
+
 
       - name: 🔍 Test connexion VM1
         run: |
