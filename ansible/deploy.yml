@@ -1,9 +1,11 @@
-- name: Déployer application Docker
+- name: Déploiement application Java Docker
   hosts: nodes
   become: yes
+  serial: 1 # déploiement progressif (pro)
 
   vars:
     image_name: "ton-dockerhub/usine-logicielle-java:latest"
+    container_name: app-java
 
   tasks:
     - name: Installer Docker
@@ -20,13 +22,27 @@
 
     - name: Supprimer ancien container
       docker_container:
-        name: app-java
+        name: "{{ container_name }}"
         state: absent
 
-    - name: Lancer nouveau container
+    - name: Télécharger image Docker
+      docker_image:
+        name: "{{ image_name }}"
+        source: pull
+
+    - name: Lancer container
       docker_container:
-        name: app-java
+        name: "{{ container_name }}"
         image: "{{ image_name }}"
         state: started
+        recreate: yes
         ports:
           - "8080:8080"
+
+    - name: Vérifier container
+      command: docker ps
+      register: docker_output
+
+    - name: Afficher résultat
+      debug:
+        var: docker_output.stdout
