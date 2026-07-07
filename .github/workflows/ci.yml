@@ -145,25 +145,34 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET_JO }}
           tags: tag:ci
 
-      - name: 🐍 Installer Ansible + dépendances
+      - name: 🐍 Installer Ansible
         run: |
           pip install ansible docker
           ansible-galaxy collection install community.docker
 
-      - name: 🔑 Configurer la clé SSH
+      - name: 🔑 Setup SSH (FIX ✅)
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_deploy
-          chmod 600 ~/.ssh/id_deploy
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_deploy
-          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
-          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
 
-      - name: 🚀 Déploiement via Ansible
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
+
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+
+      - name: 🔍 Test connexion VM1
         run: |
-          ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
-            --extra-vars "image_name=${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest"
+          ssh vagrant@${{ secrets.VM1_IP }} "echo Connected ✅"
+
+      - name: 🚀 Déploiement via VM1
+        run: |
+          ssh vagrant@${{ secrets.VM1_IP }} "
+            cd /vagrant/Projet_Usine_Logicielle &&
+            ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
+            -e image_name=${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          "
 
       - name: ✅ Fin du pipeline
         run: echo "✅ Déploiement terminé"
