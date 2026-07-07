@@ -155,14 +155,13 @@ jobs:
         run: |
           mkdir -p ~/.ssh
 
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
 
           eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_rsa
+          ssh-add ~/.ssh/id_deploy
 
-          ssh-keyscan -H ${{ secrets.VM1_IP }} >> ~/.ssh/known_hosts
-
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
       - name: 🔍 Test connexion VM1
         run: |
