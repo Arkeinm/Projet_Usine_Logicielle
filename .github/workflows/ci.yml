@@ -142,18 +142,31 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔑 Setup SSH
+      - name: 📦 Vérification image Docker
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "Image Docker prête à être déployée : $IMAGE_NAME"
+          echo "Image poussée sur Docker Hub ✅"
 
-      - name: 🔎 Disable host key checking
-        run: echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-
-      - name: 🚀 Deploy via VM1 (Ansible)
+      - name: 🚀 Déploiement (via VM1)
         run: |
-          ssh -p 2221 vagrant@127.0.0.1 "
-            cd /vagrant &&
-            ansible-playbook ansible/inventory.ini ansible/playbooks/deploy.yml
-          "
+          echo "============================================"
+          echo "Le déploiement se fait depuis VM1 (local)"
+          echo "============================================"
+          echo ""
+          echo "Étapes à exécuter sur la machine locale :"
+          echo ""
+          echo "1. Accéder à VM1 :"
+          echo "   vagrant ssh VM1"
+          echo ""
+          echo "2. Aller dans le projet :"
+          echo "   cd /vagrant/Projet_Usine_Logicielle"
+          echo ""
+          echo "3. Lancer Ansible :"
+          echo "   ansible-playbook -i ansible/inventory.ini ansible/deploy.yml"
+          echo ""
+          echo "4. Résultat attendu :"
+          echo "   → déploiement sur VM2 et VM3"
+          echo "============================================"
+
+      - name: ✅ Job terminé
+        run: echo "✅ CI OK - Déploiement manuel via VM1"

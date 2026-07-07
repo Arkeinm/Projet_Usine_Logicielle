@@ -1,0 +1,32 @@
+- name: Déployer application Docker
+  hosts: nodes
+  become: yes
+
+  vars:
+    image_name: "ton-dockerhub/usine-logicielle-java:latest"
+
+  tasks:
+    - name: Installer Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Démarrer Docker
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Supprimer ancien container
+      docker_container:
+        name: app-java
+        state: absent
+
+    - name: Lancer nouveau container
+      docker_container:
+        name: app-java
+        image: "{{ image_name }}"
+        state: started
+        ports:
+          - "8080:8080"
