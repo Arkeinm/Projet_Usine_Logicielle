@@ -74,7 +74,6 @@ jobs:
       - name: 🔍 Vérification WAR
         run: ls webapp/target
 
-      # ✅ Upload adapté (SANS rename, sans toucher build)
       - name: 📦 Upload WAR
         uses: actions/upload-artifact@v4
         with:
@@ -103,7 +102,6 @@ jobs:
       - name: 🔍 Vérification
         run: ls webapp/target
 
-      # ✅ copie vers le nom attendu par ton Dockerfile
       - name: 📦 Préparer WAR pour Docker
         run: |
           FILE=$(ls webapp/target/*.war | head -n 1)
@@ -133,8 +131,6 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:latest
 
 
-  # 🚀 3. DEPLOY (placeholder)
-
   deploy:
     runs-on: ubuntu-latest
     needs: docker
@@ -143,43 +139,29 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Vérification image Docker
-        run: |
-          echo "===================================="
-          echo "✅ CI/CD terminé avec succès"
-          echo "===================================="
-          echo ""
-          echo "Image Docker construite et publiée :"
-          echo "→ $IMAGE_NAME"
-          echo ""
-          echo "Disponible sur Docker Hub ✅"
+      - name: 🔗 Connexion Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
 
-      - name: 🚀 Instruction de déploiement via VM1
+      - name: 🐍 Installer Ansible + dépendances
         run: |
-          echo "===================================="
-          echo "🚀 DÉPLOIEMENT VIA VM1 (LOCAL)"
-          echo "===================================="
-          echo ""
-          echo "1. Accéder à VM1 :"
-          echo "   vagrant ssh VM1"
-          echo ""
-          echo "2. Aller dans le dossier partagé :"
-          echo "   cd /vagrant"
-          echo ""
-          echo "3. Cloner le projet (si nécessaire) :"
-          echo "   git clone https://github.com/Arkeinm/Projet_Usine_Logicielle.git"
-          echo ""
-          echo "4. Aller dans le projet :"
-          echo "   cd Projet_Usine_Logicielle"
-          echo ""
-          echo "5. Lancer le déploiement :"
-          echo "   ansible-playbook -i ansible/inventory.ini ansible/deploy.yml"
-          echo ""
-          echo "===================================="
-          echo "✅ Résultat attendu :"
-          echo "→ Déploiement sur VM2 et VM3"
-          echo "→ Conteneurs Docker en cours d'exécution"
-          echo "===================================="
+          pip install ansible docker
+          ansible-galaxy collection install community.docker
+
+      - name: 🔑 Configurer la clé SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+
+      - name: 🚀 Déploiement via Ansible
+        run: |
+          ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
+            --private-key ~/.ssh/id_deploy \
+            --extra-vars "image_name=${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest"
 
       - name: ✅ Fin du pipeline
-        run: echo "✅ Pipeline CI terminé - CD prêt"
+        run: echo "✅ Déploiement terminé"

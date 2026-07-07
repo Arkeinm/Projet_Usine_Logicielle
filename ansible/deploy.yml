@@ -1,16 +1,22 @@
 - name: Déploiement application Java Docker
   hosts: nodes
   become: yes
-  serial: 1 # déploiement progressif (pro)
+  serial: 1 # déploiement progressif (rolling)
 
   vars:
-    image_name: "ton-dockerhub/usine-logicielle-java:latest"
     container_name: app-java
+    # image_name est injecté via --extra-vars depuis le workflow GitHub Actions
 
   tasks:
     - name: Installer Docker
       apt:
         name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Installer le module Python docker (requis par community.docker)
+      apt:
+        name: python3-docker
         state: present
         update_cache: yes
 
