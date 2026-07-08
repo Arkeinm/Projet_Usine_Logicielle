@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: app-java
-          image: jodelnord/usine-logicielle-java:1cb760e4bbf789be367e864ad80ebb6bf308ad04
+          image: jodelnord/usine-logicielle-java:a3ea773a05cfc683a1c76381a26526f83858033e
           ports:
             - containerPort: 8080
