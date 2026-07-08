@@ -2,6 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: app-java-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/service.serversscheme: http
 spec:
   rules:
     - host: app.local
