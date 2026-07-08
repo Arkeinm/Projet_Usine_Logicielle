@@ -259,7 +259,6 @@ jobs:
   update-k8s:
     runs-on: ubuntu-latest
     needs: trivy-scan
-    environment: joseph
 
     steps:
       - name: 📥 Checkout code
@@ -270,27 +269,19 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "ci@github.com"
 
-      - name: 🏷️ Tag image Docker avec SHA
+      - name: 🏷️ Tag image Docker
         run: |
-          IMAGE_TAG=${{ github.sha }}
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
 
-      - name: 📝 Mettre à jour l’image Kubernetes
+      - name: 📝 Update deployment.yml
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" k8s/deployment.yml
 
-      - name: 🔍 Vérifier modification
-        run: |
-          echo "----- Nouveau deployment.yml -----"
-          cat k8s/deployment.yml
-
-      - name: 📤 Commit des changements
+      - name: 📤 Commit changes
         run: |
           git add k8s/deployment.yml
           git commit -m "ci: update image to ${{ github.sha }}" || echo "No changes"
 
-      - name: 🚀 Push vers repo (trigger ArgoCD)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 🚀 Push
         run: |
-          git push
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
