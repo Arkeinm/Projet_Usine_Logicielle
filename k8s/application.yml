@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://github.com/Arkeinm/Projet_Usine_Logicielle.git
     targetRevision: main
-    path: k8s
+    path: k3s
 
   destination:
     server: https://kubernetes.default.svc
