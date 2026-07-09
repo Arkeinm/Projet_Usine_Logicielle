@@ -197,7 +197,6 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME:${{ github.sha }}
 
-  # 🛡️ Scan de vulnérabilités sur l'image Docker construite
   trivy-scan:
     runs-on: ubuntu-latest
     needs: docker
