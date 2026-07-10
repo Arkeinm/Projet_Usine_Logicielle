@@ -181,24 +181,38 @@ Namespace: default
 
 Les éléments suivants sont fournis dans le cadre du projet :
 
-- [ ] Code source GitHub
-- [ ] Pipeline CI/CD complet
-- [ ] Image Docker publiée
-- [ ] Déploiement Kubernetes automatisé
-- [ ] GitOps avec ArgoCD
-- [ ] Monitoring (Prometheus + Grafana)
-- [ ] Alerting (Slack)
-- [ ] Documentation complète
+- [x] Code source GitHub
+- [x] Pipeline CI/CD complet
+- [x] Image Docker publiée
+- [x] Déploiement Kubernetes automatisé
+- [x] GitOps avec ArgoCD
+- [x] Monitoring (Prometheus + Grafana)
+- [x] Alerting (Slack)
+- [x] Documentation complète
 
 ---
 
 ## 🚀 Perspectives d’évolution
 
-- 🔹 Ingress + HTTPS (cert-manager)
-- 🔹 Horizontal Pod Autoscaler (HPA)
-- 🔹 Logs centralisés (ELK / Loki)
-- 🔹 Tracing distribué (Jaeger)
-- 🔹 Multi-environnements (dev / staging / prod)
+- 🔹 **Ingress + HTTPS (cert-manager)**
+
+  Permet d’exposer l’application via un nom de domaine propre (ex : app.local) au lieu d’un port, tout en ajoutant le HTTPS automatiquement grâce à cert-manager. Cela améliore la sécurité (TLS) et l’expérience utilisateur.
+
+- 🔹 **Horizontal Pod Autoscaler (HPA)**
+
+  Permet d’adapter automatiquement le nombre de pods en fonction de la charge (CPU, mémoire). L’application devient capable de scaler dynamiquement, ce qui améliore la performance et la disponibilité.
+
+- 🔹 **Logs centralisés (ELK / Loki)**
+
+  Centralise tous les logs des pods dans une plateforme unique. Cela permet de faciliter le debug, analyser les erreurs et tracer les incidents sans dépendre de kubectl logs.
+
+- 🔹 **Tracing distribué (Jaeger)**
+
+  Permet de suivre une requête de bout en bout dans l’application (ex : API → service → base de données). Utile pour comprendre les performances et identifier les lenteurs dans un système distribué.
+
+- 🔹 **Multi-environnements (dev / staging / prod)**
+
+  Sépare les environnements pour tester avant mise en production. Avec GitOps (ArgoCD), chaque environnement peut être lié à une branche Git différente, ce qui sécurise les déploiements.
 
 ---
 
