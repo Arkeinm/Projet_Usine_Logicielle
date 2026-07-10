@@ -1,14 +1,14 @@
-
-# 🏭 Projet Usine Logicielle – DevOps
+# 🏭 Projet Usine Logicielle – DevOps & DevSecOps
 
 ## 🎯 Objectif du projet
 
-Ce projet a pour objectif de concevoir, mettre en œuvre et présenter une **usine logicielle fonctionnelle** permettant d’automatiser le cycle de vie d’une application web.
+Ce projet a pour objectif de concevoir, déployer et superviser une **usine logicielle moderne complète** basée sur les principes DevOps et DevSecOps.
 
-L’objectif principal est de démontrer une chaîne complète allant :
+L'objectif est de démontrer un cycle de vie entièrement automatisé :
 
 ```bash
-du dépôt Git → jusqu’au déploiement automatisé
+Git → CI/CD → Docker → Kubernetes → GitOps → Monitoring → Alerting
+
 ```
 
 tout en intégrant :
@@ -34,32 +34,17 @@ Une entreprise spécialisée dans le développement d’applications web souhait
 
 ### 🟢 Objectif
 
-Mettre en place une **usine logicielle complète**, couvrant tout le cycle de vie applicatif :
+Mettre en place une **chaîne DevOps complète automatisée** :
 
 ```bash
-Développement → Intégration → Livraison → Déploiement → Supervision
+Développement → Intégration → Build → Sécurité → Déploiement → Supervision → Alerting
 ```
 
 ---
 
 ## 🧭 Vue globale de l’architecture
 
-```mermaid
-flowchart LR
-
-A[Développeur] --> B[GitHub]
-B --> C[CI-CD Pipeline]
-
-C --> D[Build npm]
-C --> E[Tests Cucumber]
-C --> F[Docker Build]
-
-F --> G[Registry]
-G --> H[Kubernetes Deploy]
-
-H --> I[Monitoring ELK]
-I --> J[Kibana Dashboard]
-```
+![Architecture Diagram](./img/architecture.png)
 
 ---
 
@@ -73,57 +58,95 @@ I --> J[Kibana Dashboard]
 | Tests | Cucumber | Tests fonctionnels | Automatisation des tests, BDD |
 | Conteneurisation | Docker | Conteneurisation des applications | Isolation, portabilité, déploiement |
 | Orchestration | Kubernetes | Déploiement et gestion des conteneurs | Scalabilité, haute disponibilité, gestion des ressources |
-| Déploiement | GitHub Actions, Ansible | Automatisation du déploiement | CI/CD, automatisation des tâches |
-| Supervision | ELK Stack (Elasticsearch, Logstash, Kibana) | Monitoring et visualisation des logs | Collecte, analyse et visualisation des logs |
+| Déploiement (phase 1) | GitHub Actions, Ansible | Automatisation du déploiement | CI/CD, automatisation des tâches |
+| GitOps (phase 2) | ArgoCD | Déploiement GitOps | Automatisation du déploiement, synchronisation avec le dépôt Git |
+| Monitoring | Prometheus | Collecte de métriques | Surveillance des performances, alerting |
+| Visualisation | Grafana | Visualisation des métriques | Tableaux de bord, alerting |
+| Alerting | Alertmanager + Slack | Notifications d’alerte | Alertes en temps réel, communication d’incidents |
 
 ---
 
 ## 🔄 Fonctionnement de l’usine logicielle
 
-### 📌 Workflow global
+### 📌 Pipeline CI/CD
 
-<p align="center">
-  <img src="./img/pipeline_complet.png" alt="Workflow global"width="200">
+```bash
+Push Git → CI déclenchée :
+   → Tests Cucumber
+   → Scan Gitleaks
+   → Scan Hadolint
+   → OWASP Dependency Check
+   → Build Maven
+   → Docker build & push
+   → Scan Trivy
+   → Update manifest Kubernetes
+```
+
+---
+
+## ⚙️ Déploiement GitOps
+
+- ArgoCD surveille le repository Git
+- Détection automatique des changements
+- Déploiement Kubernetes automatisé
+
+```bash
+git push → ArgoCD détecte → déploie → cluster mis à jour
+```
 
 ---
 
-## ⚙️ Détail des étapes
+## 🚀 Kubernetes
 
-### 1. 💻 Développement
+Cluster :
 
-- Codage avec Visual Studio Code
-- Versioning du code avec GitHub
-- Collaboration via Pull Requests
-
-### 2. 🔄 Intégration continue (CI)
-
-- Installation des dépendances
-- Build de l’application
-- Exécution des tests automatisés avec Cucumber
-
-### 3. 🚀 Livraison continue (CD)
-
-- Création de l’image Docker
-- Publication de l’image dans un registry
-- Déploiement via Kubernetes
-
-### 4. 📦 Déploiement
-
-- Automatisation avec Ansible
-- Gestion et orchestration des conteneurs avec Kubernetes
-
-### 5. 📊 Monitoring
-
-- Centralisation des logs avec ELK (Elasticsearch, Logstash, Kibana)
-- Visualisation et analyse via Kibana
+- K3s multi-node
+- NodePort / LoadBalancer (MetalLB)
+- Déploiement via manifest YAML
 
 ---
+
+## 📊 Monitoring & Observability
+
+### ✅ Prometheus
+
+- Collecte métriques cluster
+- Collecte métriques applications
+
+### ✅ Grafana
+
+- Dashboards :
+  - CPU / RAM
+  - Pods
+  - Nodes
+  - Applications
+
+---
+
+## 🚨 Alerting
+
+### Alertmanager
+
+- Détection événements critiques :
+- CPU élevé
+- Crash de pods
+- erreurs applicatives
+
+### Slack
+
+Exemple d’alerte :
+
+```bash
+🚨 ALERT: High CPU Usage
+Pod: app-java
+Namespace: default
+```
 
 ## 🧪 Qualité logicielle
 
 - Tests automatisés avec Cucumber
 - Validation à chaque pipeline CI
-- Détection précoce des anomalies
+- Feedback rapide
 - Amélioration continue de la qualité du code
 
 ---
@@ -137,13 +160,40 @@ I --> J[Kibana Dashboard]
 
 ---
 
+## 🔐 DevSecOps
+
+### ✅ Sécurité pipeline
+
+- Gitleaks → secrets
+- Trivy → vulnérabilités Docker
+  - Dependency Check → dépendances
+
+### ✅ Sécurité infra
+
+- Isolation Docker
+- Contrôle accès Kubernetes
+
+---
+
 ## 📦 Livrables
 
 Les éléments suivants sont fournis dans le cadre du projet :
 
-- [ ] Code source versionné et accessible via GitHub
-- [ ] Pipeline CI/CD entièrement fonctionnel
-- [ ] Application conteneurisée avec Docker
-- [ ] Déploiement automatisé via Kubernetes et Ansible
-- [ ] Monitoring configuré avec la stack ELK
-- [ ] Documentation complète du projet (README)
+- [ ] Code source GitHub
+- [ ] Pipeline CI/CD complet
+- [ ] Image Docker publiée
+- [ ] Déploiement Kubernetes automatisé
+- [ ] GitOps avec ArgoCD
+- [ ] Monitoring (Prometheus + Grafana)
+- [ ] Alerting (Slack)
+- [ ] Documentation complète
+
+---
+
+## 🚀 Perspectives d’évolution
+
+🔹 Ingress + HTTPS (cert-manager)
+🔹 Horizontal Pod Autoscaler (HPA)
+🔹 Logs centralisés (ELK / Loki)
+🔹 Tracing distribué (Jaeger)
+🔹 Multi-environnements (dev / staging / prod)
