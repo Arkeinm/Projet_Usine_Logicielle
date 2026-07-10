@@ -142,6 +142,8 @@ Pod: app-java
 Namespace: default
 ```
 
+---
+
 ## 🧪 Qualité logicielle
 
 - Tests automatisés avec Cucumber
@@ -197,3 +199,10 @@ Les éléments suivants sont fournis dans le cadre du projet :
 🔹 Logs centralisés (ELK / Loki)
 🔹 Tracing distribué (Jaeger)
 🔹 Multi-environnements (dev / staging / prod)
+
+---
+
+## 🧑‍💻 Auteurs
+
+- **Joseph DELNORD** – *Ingénieur Infra & DevSecOps* – [GitHub](https://github.com/josephDelnordd)
+- **Guillaume PATTI** – *Ingénieur Infra & DevSecOps* – [GitHub](https://github.com/Arkeinm)
