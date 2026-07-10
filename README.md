@@ -194,11 +194,11 @@ Les éléments suivants sont fournis dans le cadre du projet :
 
 ## 🚀 Perspectives d’évolution
 
-🔹 Ingress + HTTPS (cert-manager)
-🔹 Horizontal Pod Autoscaler (HPA)
-🔹 Logs centralisés (ELK / Loki)
-🔹 Tracing distribué (Jaeger)
-🔹 Multi-environnements (dev / staging / prod)
+- 🔹 Ingress + HTTPS (cert-manager)
+- 🔹 Horizontal Pod Autoscaler (HPA)
+- 🔹 Logs centralisés (ELK / Loki)
+- 🔹 Tracing distribué (Jaeger)
+- 🔹 Multi-environnements (dev / staging / prod)
 
 ---
 
